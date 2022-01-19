@@ -1,5 +1,5 @@
 {
-    "name": "k911/swoole-bundle",
+    "name": "cayeye-io/openswoole-bundle",
     "type": "library",
     "description": "Swoole Symfony Bundle",
     "keywords": [
@@ -20,7 +20,7 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-json": "*",
-        "ext-swoole": "^4.5.10",
+        "ext-openswoole": "^4.9.1",
         "beberlei/assert": "^3.0",
         "symfony/config": "^4.4.0|^5.0",
         "symfony/console": "^4.4.0|^5.0",
@@ -53,14 +53,12 @@
         "symfony/profiler-pack": "^1.0",
         "symfony/twig-bundle": "^4.4.0|^5.0",
         "symfony/var-dumper": "^4.4.0|^5.0",
-        "symfony/yaml": "^4.4.0|^5.0",
-        "upscale/swoole-blackfire": "^3.0"
+        "symfony/yaml": "^4.4.0|^5.0"
     },
     "suggest": {
         "ext-inotify": "To enable HMR",
         "doctrine/orm": "For using Entity Manager Handler",
         "symfony/messenger": "For using Symfony Messenger Swoole Task Transport.",
-        "upscale/swoole-blackfire": "To enable Blackfire profiling",
         "pixelfederation/doctrine-resettable-em-bundle": "To be able to recover Doctrine Entity Managers from errors",
         "symfony/error-handler": "To use Symfony Error Handler"
     },
@@ -131,8 +129,11 @@
         "process-timeout": 1200,
         "sort-packages": true,
         "platform": {
-            "php": "7.4.13",
-            "ext-swoole": "4.5.10"
+            "php": "8.1",
+            "ext-openswoole": "4.9.1"
+        },
+        "allow-plugins": {
+            "phpstan/extension-installer": true
         }
     }
 }
