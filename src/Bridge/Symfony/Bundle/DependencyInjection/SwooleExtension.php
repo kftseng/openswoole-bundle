@@ -14,6 +14,7 @@ use K911\Swoole\Bridge\Symfony\HttpFoundation\CloudFrontRequestFactory;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\RequestFactoryInterface;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\Session\SetSessionCookieEventListener;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\TrustAllProxiesRequestHandler;
+use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerPipeTransportFactory;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerPipeTransportHandler;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportFactory;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportHandler;
@@ -184,12 +185,16 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
             ->setDecoratedService(TaskHandlerInterface::class, null, -10)
         ;
 
+        $container->register(SwooleServerPipeTransportFactory::class)
+            ->addTag('messenger.transport_factory')
+            ->addArgument(new Reference(HttpServer::class))
+        ;
+
         $container->register(SwooleServerPipeTransportHandler::class)
             ->addArgument(new Reference(MessageBusInterface::class))
             ->addArgument(new Reference(SwooleServerPipeTransportHandler::class.'.inner'))
             ->setDecoratedService(PipeHandlerInterface::class, null, -10)
         ;
-
     }
 
     private function registerHttpServerConfiguration(array $config, ContainerBuilder $container): void

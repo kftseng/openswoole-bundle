@@ -128,6 +128,15 @@ final class HttpServer
         $this->getServer()->task($data);
     }
 
+    public function dispatchMessage($message): void
+    {
+        $totalWorkerCount = $this->configuration->getWorkerCount() + $this->configuration->getTaskWorkerCount();
+
+        for($workerId=0; $workerId < $totalWorkerCount; $workerId++) {
+            $this->getServer()->sendMessage($message, $workerId);
+        }
+    }
+
     /**
      * @return Listener[]
      */
