@@ -16,6 +16,7 @@ use K911\Swoole\Bridge\Symfony\HttpFoundation\Session\SetSessionCookieEventListe
 use K911\Swoole\Bridge\Symfony\HttpFoundation\TrustAllProxiesRequestHandler;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportFactory;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportHandler;
+use K911\Swoole\Bridge\Symfony\Process\SwooleProcessInterface;
 use K911\Swoole\Bridge\Upscale\Blackfire\WithProfiler;
 use K911\Swoole\Server\Config\Socket;
 use K911\Swoole\Server\Config\Sockets;
@@ -73,6 +74,9 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
         ;
         $container->registerForAutoconfiguration(ConfiguratorInterface::class)
             ->addTag('swoole_bundle.server_configurator')
+        ;
+        $container->registerForAutoconfiguration(SwooleProcessInterface::class)
+            ->addTag('swoole_bundle.process')
         ;
 
         $config = $this->processConfiguration($configuration, $configs);

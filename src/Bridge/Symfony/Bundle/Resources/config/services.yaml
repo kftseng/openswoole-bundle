@@ -134,6 +134,9 @@ services:
 
     K911\Swoole\Server\Configurator\CallableChainConfiguratorFactory:
 
+    K911\Swoole\Bridge\Symfony\Process\SwooleProcessServerConfigurator:
+        arguments: [ !tagged 'swoole_bundle.process' ]
+
     K911\Swoole\Server\Api\WithApiServerConfiguration:
         arguments:
             $requestHandler: '@swoole_bundle.server.api_server.request_handler'
