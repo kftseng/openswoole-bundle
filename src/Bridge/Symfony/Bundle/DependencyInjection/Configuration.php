@@ -62,7 +62,7 @@ final class Configuration implements ConfigurationInterface
                         ->enumNode('running_mode')
                             ->cannotBeEmpty()
                             ->defaultValue('process')
-                            ->values(['process', 'reactor', 'thread'])
+                            ->values(['process', 'reactor'])
                         ->end()
                         ->enumNode('socket_type')
                             ->cannotBeEmpty()

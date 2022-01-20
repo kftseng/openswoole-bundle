@@ -101,7 +101,7 @@ class HttpServerConfiguration
 
     public function changeRunningMode(string $runningMode): void
     {
-        Assertion::inArray($runningMode, ['process', 'reactor', 'thread']);
+        Assertion::inArray($runningMode, ['process', 'reactor']);
 
         $this->runningMode = $runningMode;
     }
