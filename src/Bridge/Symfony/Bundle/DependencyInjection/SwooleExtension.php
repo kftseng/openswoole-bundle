@@ -14,6 +14,7 @@ use K911\Swoole\Bridge\Symfony\HttpFoundation\CloudFrontRequestFactory;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\RequestFactoryInterface;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\Session\SetSessionCookieEventListener;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\TrustAllProxiesRequestHandler;
+use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerPipeTransportHandler;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportFactory;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportHandler;
 use K911\Swoole\Bridge\Upscale\Blackfire\WithProfiler;
@@ -22,7 +23,8 @@ use K911\Swoole\Server\Config\Sockets;
 use K911\Swoole\Server\Configurator\ConfiguratorInterface;
 use K911\Swoole\Server\HttpServer;
 use K911\Swoole\Server\HttpServerConfiguration;
-use K911\Swoole\Server\Process\SwooleProcessInterface;
+use K911\Swoole\Server\Process\PipeHandlerInterface;
+use K911\Swoole\Server\Process\ProcessInterface;
 use K911\Swoole\Server\RequestHandler\AdvancedStaticFilesServer;
 use K911\Swoole\Server\RequestHandler\ExceptionHandler\ExceptionHandlerInterface;
 use K911\Swoole\Server\RequestHandler\ExceptionHandler\JsonExceptionHandler;
@@ -75,7 +77,7 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
         $container->registerForAutoconfiguration(ConfiguratorInterface::class)
             ->addTag('swoole_bundle.server_configurator')
         ;
-        $container->registerForAutoconfiguration(SwooleProcessInterface::class)
+        $container->registerForAutoconfiguration(ProcessInterface::class)
             ->addTag('swoole_bundle.process')
         ;
 
@@ -181,6 +183,13 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
             ->addArgument(new Reference(SwooleServerTaskTransportHandler::class.'.inner'))
             ->setDecoratedService(TaskHandlerInterface::class, null, -10)
         ;
+
+        $container->register(SwooleServerPipeTransportHandler::class)
+            ->addArgument(new Reference(MessageBusInterface::class))
+            ->addArgument(new Reference(SwooleServerPipeTransportHandler::class.'.inner'))
+            ->setDecoratedService(PipeHandlerInterface::class, null, -10)
+        ;
+
     }
 
     private function registerHttpServerConfiguration(array $config, ContainerBuilder $container): void

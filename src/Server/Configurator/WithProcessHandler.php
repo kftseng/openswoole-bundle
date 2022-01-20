@@ -18,9 +18,9 @@ class WithProcessHandler implements ConfiguratorInterface
     public function configure(Server $server): void
     {
         foreach($this->processes as $process) {
-            $swooleProcess = new \Swoole\Process(function(\Swoole\Process $swooleProcess) use ($process) {
+            $swooleProcess = new \Swoole\Process(function(\Swoole\Process $swooleProcess) use ($process, $server) {
                 $swooleProcess->name($process->getName());
-                $process->run($swooleProcess);
+                $process->run($swooleProcess, $server);
             });
 
             $server->addProcess($swooleProcess);

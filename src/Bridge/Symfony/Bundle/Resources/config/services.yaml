@@ -99,6 +99,9 @@ services:
     K911\Swoole\Server\TaskHandler\TaskFinishedHandlerInterface:
         class: K911\Swoole\Server\TaskHandler\NoOpTaskFinishedHandler
 
+    K911\Swoole\Server\Process\PipeHandlerInterface:
+        class: K911\Swoole\Server\Process\NoOpPipeHandler
+
     K911\Swoole\Server\Api\ApiServerClientFactory:
 
     K911\Swoole\Server\Api\ApiServerClient:
@@ -136,6 +139,8 @@ services:
 
     K911\Swoole\Server\Configurator\WithProcessHandler:
         arguments: [ !tagged 'swoole_bundle.process' ]
+
+    K911\Swoole\Server\Configurator\WithPipeHandler:
 
     K911\Swoole\Server\Api\WithApiServerConfiguration:
         arguments:
