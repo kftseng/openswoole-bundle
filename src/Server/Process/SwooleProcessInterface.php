@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace K911\Swoole\Bridge\Symfony\Process;
+namespace K911\Swoole\Server\Process;
 
 interface SwooleProcessInterface
 {

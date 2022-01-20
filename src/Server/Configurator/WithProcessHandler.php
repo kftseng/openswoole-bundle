@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace K911\Swoole\Bridge\Symfony\Process;
+namespace K911\Swoole\Server\Configurator;
 
-use App\Process\TestProcess;
 use K911\Swoole\Server\Configurator\ConfiguratorInterface;
 use Swoole\Http\Server;
 
-class SwooleProcessServerConfigurator implements ConfiguratorInterface
+class WithProcessHandler implements ConfiguratorInterface
 {
     protected $processes;
 

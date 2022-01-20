@@ -16,13 +16,13 @@ use K911\Swoole\Bridge\Symfony\HttpFoundation\Session\SetSessionCookieEventListe
 use K911\Swoole\Bridge\Symfony\HttpFoundation\TrustAllProxiesRequestHandler;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportFactory;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportHandler;
-use K911\Swoole\Bridge\Symfony\Process\SwooleProcessInterface;
 use K911\Swoole\Bridge\Upscale\Blackfire\WithProfiler;
 use K911\Swoole\Server\Config\Socket;
 use K911\Swoole\Server\Config\Sockets;
 use K911\Swoole\Server\Configurator\ConfiguratorInterface;
 use K911\Swoole\Server\HttpServer;
 use K911\Swoole\Server\HttpServerConfiguration;
+use K911\Swoole\Server\Process\SwooleProcessInterface;
 use K911\Swoole\Server\RequestHandler\AdvancedStaticFilesServer;
 use K911\Swoole\Server\RequestHandler\ExceptionHandler\ExceptionHandlerInterface;
 use K911\Swoole\Server\RequestHandler\ExceptionHandler\JsonExceptionHandler;
