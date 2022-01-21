@@ -12,6 +12,7 @@ use K911\Swoole\Bridge\Symfony\ErrorHandler\SymfonyExceptionHandler;
 use K911\Swoole\Bridge\Symfony\ErrorHandler\ThrowableHandlerFactory;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\CloudFrontRequestFactory;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\RequestFactoryInterface;
+use K911\Swoole\Bridge\Symfony\HttpFoundation\ResponseExposeSwooleRequestAttributesEventListener;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\Session\SetSessionCookieEventListener;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\TrustAllProxiesRequestHandler;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerPipeTransportFactory;
@@ -329,6 +330,12 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
                 ->setPublic(false)
             ;
         }
+
+        $container->register(ResponseExposeSwooleRequestAttributesEventListener::class)
+            ->setAutowired(true)
+            ->setAutoconfigured(true)
+            ->setPublic(false)
+            ;
 
         if ($config['blackfire_profiler'] || (null === $config['blackfire_profiler'] && \class_exists(Profiler::class))) {
             $container->register(Profiler::class)
