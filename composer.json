@@ -133,7 +133,8 @@
             "ext-openswoole": "4.9.1"
         },
         "allow-plugins": {
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "symfony/runtime": true
         }
     }
 }
