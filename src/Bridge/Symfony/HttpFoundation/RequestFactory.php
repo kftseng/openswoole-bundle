@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace K911\Swoole\Bridge\Symfony\HttpFoundation;
 
+use K911\Swoole\Server\HttpServer;
 use Swoole\Http\Request as SwooleRequest;
 use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
 
 final class RequestFactory implements RequestFactoryInterface
 {
+    protected $httpServer;
+
+    public function __construct(HttpServer $httpServer) {
+        $this->httpServer = $httpServer;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -20,6 +27,9 @@ final class RequestFactory implements RequestFactoryInterface
         foreach ($request->header as $key => $value) {
             $server['HTTP_'.\mb_strtoupper(\str_replace('-', '_', $key))] = $value;
         }
+
+        $server['REQUEST_FD'] = $request->fd;
+        $server['WORKER_ID'] = $this->httpServer->getServer()->worker_id;
 
         $queryString = $server['QUERY_STRING'] ?? '';
         $server['REQUEST_URI'] = $server['REQUEST_URI'] ?? '';

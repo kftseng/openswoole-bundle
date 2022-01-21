@@ -27,6 +27,8 @@ services:
 
     K911\Swoole\Bridge\Symfony\HttpFoundation\RequestFactoryInterface:
         class: K911\Swoole\Bridge\Symfony\HttpFoundation\RequestFactory
+        arguments:
+            $httpServer: '@K911\Swoole\Server\HttpServer'
 
     K911\Swoole\Bridge\Symfony\HttpFoundation\ResponseProcessorInterface:
         class: K911\Swoole\Bridge\Symfony\HttpFoundation\ResponseProcessor
