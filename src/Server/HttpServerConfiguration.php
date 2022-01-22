@@ -27,6 +27,7 @@ class HttpServerConfiguration
     private const SWOOLE_HTTP_SERVER_CONFIG_PACKAGE_MAX_LENGTH = 'package_max_length';
     private const SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST = 'worker_max_request';
     private const SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST_GRACE = 'worker_max_request_grace';
+    private const SWOOLE_HTTP_SERVER_CONFIG_HOOKS = 'hooks';
 
     /**
      * @todo add more
@@ -48,6 +49,7 @@ class HttpServerConfiguration
         self::SWOOLE_HTTP_SERVER_CONFIG_TASK_WORKER_COUNT => 'task_worker_num',
         self::SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST => 'max_request',
         self::SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST_GRACE => 'max_request_grace',
+        self::SWOOLE_HTTP_SERVER_CONFIG_HOOKS => 'hook_flags',
     ];
 
     private const SWOOLE_SERVE_STATIC = [
@@ -64,6 +66,28 @@ class HttpServerConfiguration
         'warning' => \SWOOLE_LOG_WARNING,
         'error' => \SWOOLE_LOG_ERROR,
     ];
+
+    private const SWOOLE_HOOKS = [
+        'none' => 0,
+        'tcp' => \SWOOLE_HOOK_TCP,
+        'udp' => \SWOOLE_HOOK_UDP,
+        'unix' => \SWOOLE_HOOK_UNIX,
+        'udg' => \SWOOLE_HOOK_UDG,
+        'ssl' => \SWOOLE_HOOK_SSL,
+        'tls' => \SWOOLE_HOOK_TLS,
+        'stream_function' => \SWOOLE_HOOK_STREAM_FUNCTION,
+        'stream_select' => \SWOOLE_HOOK_STREAM_SELECT,
+        'file' => \SWOOLE_HOOK_FILE,
+        'stdio' => \SWOOLE_HOOK_STDIO,
+        'sleep' => \SWOOLE_HOOK_SLEEP,
+        'proc' => \SWOOLE_HOOK_PROC,
+        'curl' => \SWOOLE_HOOK_CURL,
+        'native_curl' => \SWOOLE_HOOK_NATIVE_CURL,
+        'blocking_function' => \SWOOLE_HOOK_BLOCKING_FUNCTION,
+        'sockets' => \SWOOLE_HOOK_SOCKETS,
+        'all' => \SWOOLE_HOOK_ALL,
+    ];
+
 
     private $sockets;
 
@@ -88,6 +112,7 @@ class HttpServerConfiguration
      *                        - package_max_length (default: '8388608b' unit in byte (8MB))
      *                        - worker_max_requests: Number of requests after which the worker reloads
      *                        - worker_max_requests_grace: Max random number of requests for worker reloading
+     *                        - hook_flags: Configuration of Swoole Runtime Hooks
      *
      * @throws \Assert\AssertionFailedException
      */
@@ -297,6 +322,24 @@ class HttpServerConfiguration
     }
 
     /**
+     * @see getSwooleSettings()
+     */
+    public function getSwooleHookFlags(): int
+    {
+        $hooks = 0;
+
+        foreach($this->settings[self::SWOOLE_HTTP_SERVER_CONFIG_HOOKS] as $hook) {
+            $hooks = $hooks | self::SWOOLE_HOOKS[$hook];
+        }
+
+        return $hooks;
+    }
+
+    public function getHooks() {
+        return $this->settings[self::SWOOLE_HTTP_SERVER_CONFIG_HOOKS];
+    }
+
+    /**
      * @throws \Assert\AssertionFailedException
      */
     public function daemonize(?string $pidFile = null): void
@@ -407,6 +450,13 @@ class HttpServerConfiguration
             case self::SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST_GRACE:
                 Assertion::nullOrInteger($value, \sprintf('Setting "%s" must be an integer or null.', $key));
                 Assertion::nullOrGreaterOrEqualThan($value, 0, 'Value cannot be negative, "%s" provided.');
+
+                break;
+            case self::SWOOLE_HTTP_SERVER_CONFIG_HOOKS:
+                Assertion::isArray($value);
+                foreach($value as $iter) {
+                    Assertion::inArray($iter, \array_keys(self::SWOOLE_HOOKS));
+                }
 
                 break;
             default:

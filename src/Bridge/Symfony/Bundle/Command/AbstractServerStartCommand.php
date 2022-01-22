@@ -202,6 +202,7 @@ abstract class AbstractServerStartCommand extends Command
             ['worker_max_request_grace', $serverConfiguration->getMaxRequestGrace()],
             ['memory_limit', format_bytes(get_max_memory())],
             ['trusted_hosts', \implode(', ', $runtimeConfiguration['trustedHosts'])],
+            ['hooks', \implode(', ', $serverConfiguration->getHooks())],
         ];
 
         if (isset($runtimeConfiguration['trustAllProxies'])) {

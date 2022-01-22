@@ -248,6 +248,13 @@ final class Configuration implements ConfigurationInterface
                                 ->scalarNode('worker_max_request_grace')
                                     ->defaultNull()
                                 ->end()
+                                ->arrayNode('hooks')
+                                    ->defaultValue(['none'])
+                                    ->prototype('scalar')->end()
+                                    ->beforeNormalization()
+                                    ->ifString()
+                                    ->then(fn ($v): array => decode_string_as_set($v))
+                                ->end()
                             ->end()
                         ->end() // settings
                     ->end()
