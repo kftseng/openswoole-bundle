@@ -19,7 +19,11 @@ class WithProcessHandler implements ConfiguratorInterface
     {
         foreach($this->processes as $process) {
             $swooleProcess = new \Swoole\Process(function(\Swoole\Process $swooleProcess) use ($process) {
-                $swooleProcess->name($process->getName());
+                try {
+                    $swooleProcess->name($process->getName());
+                } catch (\Exception $e) {
+                    fwrite(STDERR, $e->getMessage() . PHP_EOL);
+                }
                 $process->run();
             });
 
