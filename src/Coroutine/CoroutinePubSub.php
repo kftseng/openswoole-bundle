@@ -18,7 +18,7 @@ class CoroutinePubSub
     }
 
     /**
-     * Builds ob the $topicLookupTable in the form: topic => array of cids
+     * Build up the $topicLookupTable in the form: topic => array of cids
      */
     public function updateTopicLookupTable()
     {
@@ -56,7 +56,7 @@ class CoroutinePubSub
                 continue;
             }
 
-            // if couroutine is finished or was canceled in which the subscription was taken, force unsubcribe
+            // if coroutine is finished or was canceled in which the subscription was taken, force unsubcribe
             if (!Coroutine::exists($cid)) {
                 unset($this->subscriptions[$cid]);
                 $this->updateTopicLookupTable();
