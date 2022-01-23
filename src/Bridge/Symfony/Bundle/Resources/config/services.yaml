@@ -164,6 +164,8 @@ services:
     K911\Swoole\Server\Configurator\ConfiguratorInterface:
         alias: swoole_bundle.server.http_server.configurator
 
+    K911\Swoole\Coroutine\CoroutinePubSub:
+
     swoole_bundle.session.table_storage:
         alias: K911\Swoole\Bridge\Symfony\HttpFoundation\Session\SwooleSessionStorage
 
