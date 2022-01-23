@@ -2,12 +2,15 @@
 
 namespace K911\Swoole\Coroutine;
 
+use K911\Swoole\Server\HttpServer;
+use K911\Swoole\Server\Process\PipeHandlerInterface;
 use Swoole\Coroutine;
+use Swoole\Server;
 
 /**
  * PubSub Service which can be used within one process / worker to simplify communication between coroutines
  */
-class CoroutinePubSub
+class CoroutinePubSub implements PipeHandlerInterface
 {
     protected array $subscriptions = [];
     protected array $topicLookupTable = [];
@@ -39,8 +42,12 @@ class CoroutinePubSub
         $this->topicLookupTable = $topicLookupTable;
     }
 
+    public function broadcast(string $topic, mixed $message) {
+        $this->httpServer->dispatchMessage([$topic, $message]);
+    }
+
     /**
-     * Publish a message to the given topic
+     * Publish a message to the given topic within the current worker/process
      * @param string $topic
      * @param mixed $message
      */
@@ -95,4 +102,9 @@ class CoroutinePubSub
         $this->updateTopicLookupTable();
     }
 
+    public function handle(Server $server, int $fromWorkerId, mixed $message): void
+    {
+        list($topic, $data) = $message;
+        $this->publish($topic, $data);
+    }
 }
