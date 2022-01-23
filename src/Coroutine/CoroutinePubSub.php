@@ -13,22 +13,25 @@ class CoroutinePubSub
     protected array $topicLookupTable = [];
     protected array $knownTopics = [];
 
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /**
      * Builds ob the $topicLookupTable in the form: topic => array of cids
      */
-    public function updateTopicLookupTable() {
+    public function updateTopicLookupTable()
+    {
         $topicLookupTable = [];
 
-        foreach(array_keys($this->knownTopics) as $topic) {
+        foreach (array_keys($this->knownTopics) as $topic) {
             $topicLookupTable[$topic] = [];
 
-            foreach($this->subscriptions as $cid => $subscriptionData) {
+            foreach ($this->subscriptions as $cid => $subscriptionData) {
                 foreach ($subscriptionData[0] as $topicsMatcher) {
-                    if(preg_match("/$topicsMatcher/", $topic))
+                    if (preg_match("/$topicsMatcher/", $topic)) {
                         $topicLookupTable[$topic][] = $cid;
+                    }
                 }
             }
         }
@@ -41,15 +44,24 @@ class CoroutinePubSub
      * @param string $topic
      * @param mixed $message
      */
-    public function publish(string $topic, mixed $message) {
-        if(!array_key_exists($topic, $this->knownTopics)) {
+    public function publish(string $topic, mixed $message)
+    {
+        if (!array_key_exists($topic, $this->knownTopics)) {
             $this->knownTopics[$topic] = 1;
             $this->updateTopicLookupTable();
         }
 
-        foreach($this->topicLookupTable[$topic] as $cid) {
-            if(!array_key_exists($cid, $this->subscriptions))
+        foreach ($this->topicLookupTable[$topic] as $cid) {
+            if (!array_key_exists($cid, $this->subscriptions)) {
                 continue;
+            }
+
+            // if couroutine is finished or was canceled in which the subscription was taken, force unsubcribe
+            if (!Coroutine::exists($cid)) {
+                unset($this->subscriptions[$cid]);
+                $this->updateTopicLookupTable();
+                continue;
+            }
 
             $this->subscriptions[$cid][1]($this, $topic, $message);
         }
@@ -61,7 +73,8 @@ class CoroutinePubSub
      * @param array $topics
      * @param callable $callback
      */
-    public function subscribe(array $topics, callable $callback): void {
+    public function subscribe(array $topics, callable $callback): void
+    {
         $cid = Coroutine::getCid();
         $this->subscriptions[$cid] = [$topics, $callback];
         $this->updateTopicLookupTable();
@@ -72,11 +85,11 @@ class CoroutinePubSub
      * Unsubscribe from all topics and free resources
      * @throws \Exception
      */
-    public function unsubscribe(): void {
+    public function unsubscribe(): void
+    {
         $cid = Coroutine::getCid();
-        if(!array_key_exists($cid, $this->subscriptions)) {
+        if (!array_key_exists($cid, $this->subscriptions)) {
             throw new \Exception("Could not unsubscribe coroutine #".$cid.". Did you subscribe in the same coroutine?");
-            return;
         }
         unset($this->subscriptions[$cid]);
         $this->updateTopicLookupTable();
