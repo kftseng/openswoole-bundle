@@ -34,7 +34,7 @@ class SwooleMessageBus
     /**
      * Build up the $topicLookupTable in the form: topic => array of cids
      */
-    public function updateTopicLookupTable()
+    private function updateTopicLookupTable()
     {
         $topicLookupTable = [];
 
