@@ -25,7 +25,7 @@ final class SwooleMessageBusPipeHandler implements PipeHandlerInterface
     {
         if(is_array($message)) {
             list($topic, $data) = $message;
-            $this->bus->publish($topic, $data);
+            $this->bus->publish($topic, $data, SwooleMessageBus::RECIPIENT_THIS_WORKER);
         }
 
         if ($this->decorated instanceof PipeHandlerInterface) {

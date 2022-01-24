@@ -16,6 +16,11 @@ use Throwable;
 
 final class HttpServer
 {
+    public const RECIPIENT_EVENT_WORKERS = 1;
+    public const RECIPIENT_TASK_WORKERS = 2;
+    public const RECIPIENT_USER_WORKERS = 4;
+    public const RECIPIENT_ALL = 15;
+
     public const GRACEFUL_SHUTDOWN_TIMEOUT_SECONDS = 10;
 
     private $running;
@@ -32,6 +37,8 @@ final class HttpServer
     private $signalTerminate;
     private $signalReload;
     private $signalKill;
+
+    private array $metricsCache = [];
 
     public function __construct(HttpServerConfiguration $configuration, bool $running = false)
     {
@@ -101,6 +108,10 @@ final class HttpServer
         }
     }
 
+    public function updateMetricsCache(): void {
+        $this->metricsCache = $this->getServer()->stats();
+    }
+
     public function metrics(): array
     {
         return $this->getServer()->stats();
@@ -128,13 +139,37 @@ final class HttpServer
         $this->getServer()->task($data);
     }
 
-    public function dispatchMessage($message): void
-    {
-        $totalWorkerCount = $this->configuration->getWorkerCount() + $this->configuration->getTaskWorkerCount();
+    protected function sendMessageToWorkerType($message, $type) {
+        if(!isset($this->metricsCache[$type])) {
+            return false;
+        }
 
-        for($workerId=0; $workerId < $totalWorkerCount; $workerId++) {
+        foreach($this->metricsCache[$type] as $worker) {
+            $workerId = $worker['worker_id'];
+
+            // don't send a message to ourselve
+            if($workerId == $this->getServer()->worker_id)
+                continue;
+
             $this->getServer()->sendMessage($message, $workerId);
         }
+
+        return true;
+    }
+
+    public function sendMessage($message, $recipients = self::RECIPIENT_EVENT_WORKERS): void
+    {
+        if(!$this->metricsCache)
+            $this->updateMetricsCache();
+
+        if($recipients & self::RECIPIENT_EVENT_WORKERS)
+            $this->sendMessageToWorkerType($message, 'event_workers');
+
+        if($recipients & self::RECIPIENT_TASK_WORKERS)
+            $this->sendMessageToWorkerType($message, 'task_workers');
+
+        if($recipients & self::RECIPIENT_USER_WORKERS)
+            $this->sendMessageToWorkerType($message, 'user_workers');
     }
 
     /**

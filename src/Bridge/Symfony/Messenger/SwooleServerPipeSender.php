@@ -28,7 +28,7 @@ final class SwooleServerPipeSender implements SenderInterface
         $sentStamp = $envelope->last(SentStamp::class);
         $alias = null === $sentStamp ? 'swoole-process' : $sentStamp->getSenderAlias() ?? $sentStamp->getSenderClass();
 
-        $this->httpServer->dispatchMessage($envelope->with(new ReceivedStamp($alias)));
+        $this->httpServer->sendMessage($envelope->with(new ReceivedStamp($alias)));
 
         return $envelope;
     }
