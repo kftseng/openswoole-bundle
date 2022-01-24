@@ -22,7 +22,7 @@ class SwooleStreamedResponse extends Response
      * @param int $timeout
      * @return bool
      */
-    public function write($data, $timeout = -1): bool {
+    public function push($data, $timeout = -1): bool {
         if($this->channel->isFull() && !$this->isClosed())
             return false;
 

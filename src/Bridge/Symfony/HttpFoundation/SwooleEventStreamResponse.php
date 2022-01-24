@@ -16,7 +16,7 @@ class SwooleEventStreamResponse extends SwooleStreamedResponse
         ]);
     }
 
-    public function writeEvent(?string $event, ?string $data)
+    public function pushEvent(?string $event, ?string $data)
     {
         $message = "";
 
@@ -28,6 +28,6 @@ class SwooleEventStreamResponse extends SwooleStreamedResponse
 
         $message .= "\n";
 
-        return $this->write($message);
+        return $this->push($message);
     }
 }
