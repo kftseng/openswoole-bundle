@@ -13,10 +13,19 @@ class SwooleStreamedResponse extends Response
     public function __construct(int $status = 200, array $headers = [])
     {
         parent::__construct(null, $status, $headers);
-        $this->channel = new Channel(1);
+        $this->channel = new Channel(100);
     }
 
-    public function write($data, $timeout = -1) {
+    /**
+     * A successful write to the channel will return true and a full or closed channel or timeout will return false.
+     * @param $data
+     * @param int $timeout
+     * @return bool
+     */
+    public function write($data, $timeout = -1): bool {
+        if($this->channel->length() == $this->channel->capacity)
+            return false;
+
         return $this->channel->push($data, $timeout);
     }
 
