@@ -1,6 +1,8 @@
 <?php
 
-namespace K911\Swoole\Coroutine;
+declare(strict_types=1);
+
+namespace K911\Swoole\MessageBus;
 
 use K911\Swoole\Server\HttpServer;
 use K911\Swoole\Server\Process\PipeHandlerInterface;
@@ -10,14 +12,17 @@ use Swoole\Server;
 /**
  * PubSub Service which can be used within one process / worker to simplify communication between coroutines
  */
-class CoroutinePubSub implements PipeHandlerInterface
+class SwooleMessageBus
 {
+    protected HttpServer $httpServer;
+
     protected array $subscriptions = [];
     protected array $topicLookupTable = [];
     protected array $knownTopics = [];
 
-    public function __construct()
+    public function __construct(HttpServer $httpServer)
     {
+        $this->httpServer = $httpServer;
     }
 
     /**
@@ -100,11 +105,5 @@ class CoroutinePubSub implements PipeHandlerInterface
         }
         unset($this->subscriptions[$cid]);
         $this->updateTopicLookupTable();
-    }
-
-    public function handle(Server $server, int $fromWorkerId, mixed $message): void
-    {
-        list($topic, $data) = $message;
-        $this->publish($topic, $data);
     }
 }

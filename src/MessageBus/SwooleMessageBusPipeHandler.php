@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace K911\Swoole\Bridge\Symfony\Messenger;
+namespace K911\Swoole\MessageBus;
 
 use Assert\Assertion;
 use K911\Swoole\Server\Process\PipeHandlerInterface;
@@ -10,12 +10,12 @@ use Swoole\Server;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-final class SwooleServerPipeTransportHandler implements PipeHandlerInterface
+final class SwooleMessageBusPipeHandler implements PipeHandlerInterface
 {
     private $bus;
     private $decorated;
 
-    public function __construct(MessageBusInterface $bus, ?PipeHandlerInterface $decorated = null)
+    public function __construct(SwooleMessageBus $bus, ?PipeHandlerInterface $decorated = null)
     {
         $this->bus = $bus;
         $this->decorated = $decorated;
@@ -23,8 +23,9 @@ final class SwooleServerPipeTransportHandler implements PipeHandlerInterface
 
     public function handle(Server $server, int $fromWorkerId, mixed $message): void
     {
-        if($message instanceof Envelope) {
-            $this->bus->dispatch($message);
+        if(is_array($message)) {
+            list($topic, $data) = $message;
+            $this->bus->publish($topic, $data);
         }
 
         if ($this->decorated instanceof PipeHandlerInterface) {
