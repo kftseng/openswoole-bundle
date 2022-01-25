@@ -214,6 +214,10 @@ final class Configuration implements ConfigurationInterface
                         ->arrayNode('settings')
                             ->addDefaultsIfNotSet()
                             ->children()
+                                ->booleanNode('http2_enabled')
+                                    ->defaultFalse()
+                                    ->treatNullLike(false)
+                                ->end()
                                 ->scalarNode('log_file')
                                     // TODO: NEXT MAJOR - remove default value
                                     ->defaultValue('%kernel.logs_dir%/swoole_%kernel.environment%.log')

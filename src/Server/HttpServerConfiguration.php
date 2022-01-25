@@ -28,6 +28,7 @@ class HttpServerConfiguration
     private const SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST = 'worker_max_request';
     private const SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST_GRACE = 'worker_max_request_grace';
     private const SWOOLE_HTTP_SERVER_CONFIG_HOOKS = 'hooks';
+    private const SWOOLE_HTTP_SERVER_CONFIG_HTTP2_ENABLED = 'http2_enabled';
 
     /**
      * @todo add more
@@ -50,6 +51,7 @@ class HttpServerConfiguration
         self::SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST => 'max_request',
         self::SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST_GRACE => 'max_request_grace',
         self::SWOOLE_HTTP_SERVER_CONFIG_HOOKS => 'hook_flags',
+        self::SWOOLE_HTTP_SERVER_CONFIG_HTTP2_ENABLED => 'open_http2_protocol',
     ];
 
     private const SWOOLE_SERVE_STATIC = [
@@ -279,6 +281,11 @@ class HttpServerConfiguration
         }
 
         return $swooleSettings;
+    }
+
+    public function getSwooleOpenHttp2Protocol(): bool
+    {
+        return $this->settings[self::SWOOLE_HTTP_SERVER_CONFIG_HTTP2_ENABLED];
     }
 
     /**

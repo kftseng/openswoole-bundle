@@ -203,6 +203,8 @@ abstract class AbstractServerStartCommand extends Command
             ['memory_limit', format_bytes(get_max_memory())],
             ['trusted_hosts', \implode(', ', $runtimeConfiguration['trustedHosts'])],
             ['hooks', \implode(', ', $serverConfiguration->getHooks())],
+            ['http2_enabled', \var_export($serverConfiguration->getSwooleOpenHttp2Protocol(), true)],
+
         ];
 
         if (isset($runtimeConfiguration['trustAllProxies'])) {
