@@ -218,6 +218,12 @@ final class Configuration implements ConfigurationInterface
                                     ->defaultFalse()
                                     ->treatNullLike(false)
                                 ->end()
+                                ->scalarNode('ssl_cert_file')
+                                    ->defaultNull()
+                                ->end()
+                                ->scalarNode('ssl_key_file')
+                                    ->defaultNull()
+                                ->end()
                                 ->scalarNode('log_file')
                                     // TODO: NEXT MAJOR - remove default value
                                     ->defaultValue('%kernel.logs_dir%/swoole_%kernel.environment%.log')

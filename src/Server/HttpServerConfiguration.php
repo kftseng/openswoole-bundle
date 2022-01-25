@@ -29,6 +29,8 @@ class HttpServerConfiguration
     private const SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST_GRACE = 'worker_max_request_grace';
     private const SWOOLE_HTTP_SERVER_CONFIG_HOOKS = 'hooks';
     private const SWOOLE_HTTP_SERVER_CONFIG_HTTP2_ENABLED = 'http2_enabled';
+    private const SWOOLE_HTTP_SERVER_CONFIG_SSL_CERT_FILE = 'ssl_cert_file';
+    private const SWOOLE_HTTP_SERVER_CONFIG_SSL_KEY_FILE = 'ssl_key_file';
 
     /**
      * @todo add more
@@ -52,6 +54,8 @@ class HttpServerConfiguration
         self::SWOOLE_HTTP_SERVER_CONFIG_WORKER_MAX_REQUEST_GRACE => 'max_request_grace',
         self::SWOOLE_HTTP_SERVER_CONFIG_HOOKS => 'hook_flags',
         self::SWOOLE_HTTP_SERVER_CONFIG_HTTP2_ENABLED => 'open_http2_protocol',
+        self::SWOOLE_HTTP_SERVER_CONFIG_SSL_CERT_FILE => 'ssl_cert_file',
+        self::SWOOLE_HTTP_SERVER_CONFIG_SSL_KEY_FILE => 'ssl_key_file'
     ];
 
     private const SWOOLE_SERVE_STATIC = [
@@ -115,6 +119,9 @@ class HttpServerConfiguration
      *                        - worker_max_requests: Number of requests after which the worker reloads
      *                        - worker_max_requests_grace: Max random number of requests for worker reloading
      *                        - hook_flags: Configuration of Swoole Runtime Hooks
+     *                        - http2_enabled: Enable HTTP2
+     *                        - ssl_cert_file: SSL Cert file
+     *                        - ssl_key_file: SSL Key file
      *
      * @throws \Assert\AssertionFailedException
      */
@@ -280,12 +287,39 @@ class HttpServerConfiguration
             }
         }
 
+        $swooleSettings = [
+            'open_http2_protocol' => 1,
+            'enable_static_handler' => TRUE,
+            'document_root' => __DIR__,
+            'enable_coroutine' => true,
+            'ssl_cert_file' => '/Users/julian/Projects/cayeye-io/connector/config/ssl/ssl.crt',
+            'ssl_key_file' => '/Users/julian/Projects/cayeye-io/connector/config/ssl/ssl.key',
+        ];
+
+/*
+        $swooleSettings['ssl_cert_file'] = '/Users/julian/Projects/cayeye-io/connector/config/ssl/ssl.crt';
+        $swooleSettings['ssl_key_file'] = '/Users/julian/Projects/cayeye-io/connector/config/ssl/ssl.key';
+        $swooleSettings['open_http2_protocol'] = true;
+        $swooleSettings['open_http2_protocol'] = 1;
+        $swooleSettings['enable_coroutine'] = true;
+        $swooleSettings['enable_static_handler'] = true;
+*/
         return $swooleSettings;
+    }
+
+    public function getSwooleSslCertFile(): ?string
+    {
+        return $this->settings[self::SWOOLE_HTTP_SERVER_CONFIG_SSL_CERT_FILE] ?? null;
+    }
+
+    public function getSwooleSslKeyFile(): ?string
+    {
+        return $this->settings[self::SWOOLE_HTTP_SERVER_CONFIG_SSL_KEY_FILE] ?? null;
     }
 
     public function getSwooleOpenHttp2Protocol(): bool
     {
-        return $this->settings[self::SWOOLE_HTTP_SERVER_CONFIG_HTTP2_ENABLED];
+        return $this->settings[self::SWOOLE_HTTP_SERVER_CONFIG_HTTP2_ENABLED] ?? false;
     }
 
     /**

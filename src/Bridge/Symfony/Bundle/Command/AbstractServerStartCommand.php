@@ -204,7 +204,8 @@ abstract class AbstractServerStartCommand extends Command
             ['trusted_hosts', \implode(', ', $runtimeConfiguration['trustedHosts'])],
             ['hooks', \implode(', ', $serverConfiguration->getHooks())],
             ['http2_enabled', \var_export($serverConfiguration->getSwooleOpenHttp2Protocol(), true)],
-
+            ['ssl_cert_file', $serverConfiguration->getSwooleSslCertFile()],
+            ['ssl_key_file', $serverConfiguration->getSwooleSslKeyFile()],
         ];
 
         if (isset($runtimeConfiguration['trustAllProxies'])) {
