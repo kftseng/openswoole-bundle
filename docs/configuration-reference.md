@@ -83,6 +83,10 @@ swoole:
         # see https://www.swoole.co.uk/docs/modules/swoole-server/configuration
         settings:
             hook: all
+            http2_enabled: true
+            ssl_cert_file: '%kernel.project_dir%/config/ssl/ssl.crt'
+            ssl_key_file: '%kernel.project_dir%/config/ssl/ssl.key'
+
             reactor_count: 2
             worker_count: 4
             # when not set, swoole sets these are automatically set based on count of host CPU cores
