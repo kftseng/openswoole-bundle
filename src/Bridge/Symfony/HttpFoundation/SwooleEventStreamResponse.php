@@ -11,7 +11,6 @@ class SwooleEventStreamResponse extends SwooleStreamedResponse
         parent::__construct(200, [
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'no-cache',
-            'Connection' => 'keep-alive',
             'X-Accel-Buffering' => 'no'
         ]);
     }
