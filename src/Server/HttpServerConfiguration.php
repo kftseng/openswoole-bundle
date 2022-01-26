@@ -287,6 +287,10 @@ class HttpServerConfiguration
             }
         }
 
+        $swooleSettings['http_autoindex'] = true;
+        $swooleSettings['http_index_files'] = ['index.html'];
+
+
         return $swooleSettings;
     }
 
