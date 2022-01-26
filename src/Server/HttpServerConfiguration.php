@@ -287,23 +287,6 @@ class HttpServerConfiguration
             }
         }
 
-        $swooleSettings = [
-            'open_http2_protocol' => 1,
-            'enable_static_handler' => TRUE,
-            'document_root' => __DIR__,
-            'enable_coroutine' => true,
-            'ssl_cert_file' => '/Users/julian/Projects/cayeye-io/connector/config/ssl/ssl.crt',
-            'ssl_key_file' => '/Users/julian/Projects/cayeye-io/connector/config/ssl/ssl.key',
-        ];
-
-/*
-        $swooleSettings['ssl_cert_file'] = '/Users/julian/Projects/cayeye-io/connector/config/ssl/ssl.crt';
-        $swooleSettings['ssl_key_file'] = '/Users/julian/Projects/cayeye-io/connector/config/ssl/ssl.key';
-        $swooleSettings['open_http2_protocol'] = true;
-        $swooleSettings['open_http2_protocol'] = 1;
-        $swooleSettings['enable_coroutine'] = true;
-        $swooleSettings['enable_static_handler'] = true;
-*/
         return $swooleSettings;
     }
 
