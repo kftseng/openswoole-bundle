@@ -105,6 +105,32 @@ final class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                        ->arrayNode('https_redirector')
+                            ->addDefaultsIfNotSet()
+                            ->beforeNormalization()
+                                ->ifTrue(fn ($v): bool => \is_string($v) || \is_bool($v) || \is_numeric($v) || null === $v)
+                                ->then(function ($v): array {
+                                    return [
+                                        'enabled' => (bool) $v,
+                                        'host' => '0.0.0.0',
+                                        'port' => 80,
+                                    ];
+                                })
+                            ->end()
+                            ->children()
+                                ->booleanNode('enabled')
+                                    ->defaultFalse()
+                                ->end()
+                                ->scalarNode('host')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue('0.0.0.0')
+                                ->end()
+                                ->scalarNode('port')
+                                   ->cannotBeEmpty()
+                                   ->defaultValue(80)
+                               ->end()
+                            ->end()
+                        ->end()
                         ->arrayNode('static')
                             ->addDefaultsIfNotSet()
                             ->beforeNormalization()

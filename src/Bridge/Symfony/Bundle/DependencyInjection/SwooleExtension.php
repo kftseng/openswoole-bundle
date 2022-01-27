@@ -124,6 +124,8 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
         $container->setParameter('swoole.http_server.trusted_hosts', $config['trusted_hosts']);
         $container->setParameter('swoole.http_server.api.host', $config['api']['host']);
         $container->setParameter('swoole.http_server.api.port', $config['api']['port']);
+        $container->setParameter('swoole.http_server.https_redirector.host', $config['https_redirector']['host']);
+        $container->setParameter('swoole.http_server.https_redirector.port', $config['https_redirector']['port']);
 
         $this->registerHttpServerConfiguration($config, $container);
     }
@@ -221,6 +223,7 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
         [
             'static' => $static,
             'api' => $api,
+            'https_redirector' => $httpsRedirector,
             'hmr' => $hmr,
             'host' => $host,
             'port' => $port,
@@ -262,6 +265,12 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
 
         if ($api['enabled']) {
             $sockets->addArgument(new Definition(Socket::class, [$api['host'], $api['port']]));
+        } else {
+            $sockets->addArgument(null);
+        }
+
+        if ($httpsRedirector['enabled']) {
+            $sockets->addArgument(new Definition(Socket::class, [$httpsRedirector['host'], $httpsRedirector['port']]));
         }
 
         $container->getDefinition(HttpServerConfiguration::class)

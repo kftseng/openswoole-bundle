@@ -17,10 +17,16 @@ final class Sockets
      */
     private $apiSocket;
 
-    public function __construct(Socket $serverSocket, ?Socket $apiSocket = null, Socket ...$additionalSockets)
+    /**
+     * @var null|Socket
+     */
+    private $httpsRedirectorSocket;
+
+    public function __construct(Socket $serverSocket, ?Socket $apiSocket = null, ?Socket $httpsRedirectorSocket = null, Socket ...$additionalSockets)
     {
         $this->serverSocket = $serverSocket;
         $this->apiSocket = $apiSocket;
+        $this->httpsRedirectorSocket = $httpsRedirectorSocket;
         $this->additionalSockets = $additionalSockets;
     }
 
@@ -46,6 +52,18 @@ final class Sockets
         return $this->apiSocket instanceof Socket;
     }
 
+    public function getHttpsRedirectorSocket(): Socket
+    {
+        Assertion::isInstanceOf($this->httpsRedirectorSocket, Socket::class, 'HTTPS redirector Socket is not defined.');
+
+        return $this->httpsRedirectorSocket;
+    }
+
+    public function hasHttpsRedirectorSocket(): bool
+    {
+        return $this->httpsRedirectorSocket instanceof Socket;
+    }
+
     public function disableApiSocket(): void
     {
         $this->apiSocket = null;
@@ -68,6 +86,10 @@ final class Sockets
 
         if ($this->hasApiSocket()) {
             yield $this->apiSocket;
+        }
+
+        if ($this->hasHttpsRedirectorSocket()) {
+            yield $this->httpsRedirectorSocket;
         }
 
         yield from $this->additionalSockets;

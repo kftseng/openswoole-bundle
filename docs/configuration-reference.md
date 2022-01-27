@@ -63,6 +63,16 @@ swoole:
         #     host: 0.0.0.0
         #     port: 9200
 
+        # enables https redirection
+        # by default it is disabled
+        https_redirector: true
+        # equals to:
+        # ---
+        # https_redirector:
+        #     enabled: true
+        #     host: 0.0.0.0
+        #     port: 80
+        
         # additional swoole symfony bundle services
         services:
 

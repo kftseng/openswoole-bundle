@@ -249,10 +249,17 @@ abstract class AbstractServerStartCommand extends Command
         $sockets = $this->serverConfiguration->getSockets();
         $serverSocket = $sockets->getServerSocket();
 
+        $additionalSockets = [];
+        if($sockets->hasApiSocket())
+            $additionalSockets[] = $sockets->getApiSocket();
+
+        if($sockets->hasHttpsRedirectorSocket())
+            $additionalSockets[] = $sockets->getHttpsRedirectorSocket();
+
         return HttpServerFactory::make(
             $serverSocket,
             $this->serverConfiguration->getRunningMode(),
-            ...($sockets->hasApiSocket() ? [$sockets->getApiSocket()] : [])
+            ...$additionalSockets
         );
     }
 

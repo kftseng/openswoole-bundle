@@ -146,6 +146,16 @@ services:
 
     K911\Swoole\Server\Configurator\WithPipeHandler:
 
+
+    K911\Swoole\Server\HttpsRedirector\WithHttpsRedirectorServerConfiguration:
+        arguments:
+            $requestHandler: '@K911\Swoole\Server\HttpsRedirector\HttpsRedirectorRequestHandler'
+
+
+    K911\Swoole\Server\HttpsRedirector\HttpsRedirectorRequestHandler:
+        class: K911\Swoole\Server\HttpsRedirector\HttpsRedirectorRequestHandler
+
+
     K911\Swoole\Server\Api\WithApiServerConfiguration:
         arguments:
             $requestHandler: '@swoole_bundle.server.api_server.request_handler'
