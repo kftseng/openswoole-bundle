@@ -84,6 +84,8 @@ swoole:
         settings:
             hook: all
             http2_enabled: true
+            http_index_files: index.html
+            
             ssl_cert_file: '%kernel.project_dir%/config/ssl/ssl.crt'
             ssl_key_file: '%kernel.project_dir%/config/ssl/ssl.key'
 

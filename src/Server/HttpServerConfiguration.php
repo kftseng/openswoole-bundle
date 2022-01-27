@@ -31,6 +31,7 @@ class HttpServerConfiguration
     private const SWOOLE_HTTP_SERVER_CONFIG_HTTP2_ENABLED = 'http2_enabled';
     private const SWOOLE_HTTP_SERVER_CONFIG_SSL_CERT_FILE = 'ssl_cert_file';
     private const SWOOLE_HTTP_SERVER_CONFIG_SSL_KEY_FILE = 'ssl_key_file';
+    private const SWOOLE_HTTP_SERVER_CONFIG_HTTP_INDEX_FILES = 'http_index_files';
 
     /**
      * @todo add more
@@ -55,7 +56,8 @@ class HttpServerConfiguration
         self::SWOOLE_HTTP_SERVER_CONFIG_HOOKS => 'hook_flags',
         self::SWOOLE_HTTP_SERVER_CONFIG_HTTP2_ENABLED => 'open_http2_protocol',
         self::SWOOLE_HTTP_SERVER_CONFIG_SSL_CERT_FILE => 'ssl_cert_file',
-        self::SWOOLE_HTTP_SERVER_CONFIG_SSL_KEY_FILE => 'ssl_key_file'
+        self::SWOOLE_HTTP_SERVER_CONFIG_SSL_KEY_FILE => 'ssl_key_file',
+        self::SWOOLE_HTTP_SERVER_CONFIG_HTTP_INDEX_FILES => 'http_index_files',
     ];
 
     private const SWOOLE_SERVE_STATIC = [
@@ -122,6 +124,7 @@ class HttpServerConfiguration
      *                        - http2_enabled: Enable HTTP2
      *                        - ssl_cert_file: SSL Cert file
      *                        - ssl_key_file: SSL Key file
+     *                        - http_index_files: Files that can be used as directory index
      *
      * @throws \Assert\AssertionFailedException
      */
@@ -288,6 +291,11 @@ class HttpServerConfiguration
         }
 
         return $swooleSettings;
+    }
+
+    public function getSwooleHttpIndexFiles(): array
+    {
+        return $this->settings[self::SWOOLE_HTTP_SERVER_CONFIG_HTTP_INDEX_FILES] ?? [];
     }
 
     public function getSwooleSslCertFile(): ?string
