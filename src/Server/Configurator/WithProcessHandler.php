@@ -34,6 +34,7 @@ class WithProcessHandler implements ConfiguratorInterface
             $userWorker = new Process(function(Process $userWorker) use ($processDefinitionInstance, $server) {
                 \Swoole\Coroutine\run(function() use ($server, $userWorker) {
                     while ($data = $userWorker->pop()) {
+                        $data = unserialize($data);
                         //TODO: set real worker id
                         $this->handler->handle($server, -1, $data);
                     }

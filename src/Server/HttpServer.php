@@ -149,7 +149,7 @@ final class HttpServer
     protected function sendMessageToWorkerType($message, $type) {
         if('user_workers' === $type) {
             foreach($this->userWorkers as $userWorker) {
-                $userWorker->push($message);
+                $userWorker->push(serialize($message));
             }
 
             return true;
