@@ -9,6 +9,4 @@ use Swoole\Process;
 interface ProcessInterface
 {
     public function run() : void;
-
-    public function getName() : string;
 }
