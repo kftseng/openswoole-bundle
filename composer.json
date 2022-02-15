@@ -21,6 +21,7 @@
         "php": ">=8.0.2",
         "ext-json": "*",
         "ext-openswoole": "*",
+        "ext-igbinary": "*",
         "beberlei/assert": "^3.0",
         "symfony/config": "^5.4",
         "symfony/console": "^5.4",
