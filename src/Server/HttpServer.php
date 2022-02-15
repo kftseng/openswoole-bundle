@@ -40,6 +40,9 @@ final class HttpServer
 
     private array $metricsCache = [];
 
+    /** @var Process[] $userWorkers */
+    private array $userWorkers = [];
+
     public function __construct(HttpServerConfiguration $configuration, bool $running = false)
     {
         $this->signalTerminate = \defined('SIGTERM') ? (int) \constant('SIGTERM') : 15;
@@ -48,6 +51,10 @@ final class HttpServer
 
         $this->running = $running;
         $this->configuration = $configuration;
+    }
+
+    public function addUserWorker(Process $worker) {
+        $this->userWorkers[] = $worker;
     }
 
     /**
@@ -140,6 +147,14 @@ final class HttpServer
     }
 
     protected function sendMessageToWorkerType($message, $type) {
+        if('user_workers' === $type) {
+            foreach($this->userWorkers as $userWorker) {
+                $userWorker->push($message);
+            }
+
+            return true;
+        }
+
         if(!isset($this->metricsCache[$type])) {
             return false;
         }
