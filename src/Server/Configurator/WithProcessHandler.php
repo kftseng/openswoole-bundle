@@ -28,23 +28,23 @@ class WithProcessHandler implements ConfiguratorInterface
     {
         foreach($this->processes as $processDefinitionInstance) {
             $processDefinitionName = get_class($processDefinitionInstance);
-            $processDefinitionFilename = (new \ReflectionClass($processDefinitionName))->getFileName();
-            $processDefinitionSysVId = ftok($processDefinitionFilename, "1");
 
             $userWorker = new Process(function(Process $userWorker) use ($processDefinitionInstance, $server) {
-                \Swoole\Coroutine\run(function() use ($server, $userWorker) {
-                    while ($data = $userWorker->pop()) {
-                        $data = unserialize($data);
-                        //TODO: set real worker id
-                        $this->handler->handle($server, -1, $data);
-                    }
+                go(function() use ($processDefinitionInstance) {
+                    $processDefinitionInstance->run();
                 });
 
-                $processDefinitionInstance->run();
+                // run sidecar coroutine to process incoming data from pipe
+                go(function() use ($server, $userWorker) {
+                    while ($data = $userWorker->read()) {
+                        $data = unserialize($data);
+                        $this->handler->handle($server, $data[0], $data[1]);
+                    }
+                });
             });
 
-            $userWorker->useQueue($processDefinitionSysVId);
             $userWorker->name($processDefinitionName);
+
             $server->addProcess($userWorker);
 
             $this->httpServer->addUserWorker($userWorker);
