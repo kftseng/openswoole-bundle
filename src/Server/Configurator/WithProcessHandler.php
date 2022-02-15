@@ -7,6 +7,7 @@ namespace K911\Swoole\Server\Configurator;
 use K911\Swoole\Server\Configurator\ConfiguratorInterface;
 use K911\Swoole\Server\HttpServer;
 use K911\Swoole\Server\Process\PipeHandlerInterface;
+use Swoole\Coroutine;
 use Swoole\Event;
 use Swoole\Http\Server;
 use Swoole\Process;
@@ -30,12 +31,12 @@ class WithProcessHandler implements ConfiguratorInterface
             $processDefinitionName = get_class($processDefinitionInstance);
 
             $userWorker = new Process(function(Process $userWorker) use ($processDefinitionInstance, $server) {
-                go(function() use ($processDefinitionInstance) {
+                Coroutine::create(function() use ($processDefinitionInstance) {
                     $processDefinitionInstance->run();
                 });
 
                 // run sidecar coroutine to process incoming data from pipe
-                go(function() use ($server, $userWorker) {
+                Coroutine::create(function() use ($server, $userWorker) {
                     while ($data = $userWorker->read()) {
                         $data = unserialize($data);
                         $this->handler->handle($server, $data[0], $data[1]);
