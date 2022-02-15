@@ -17,8 +17,7 @@ class SwooleMessageBus
     public const RECIPIENT_EVENT_WORKERS = 1;
     public const RECIPIENT_TASK_WORKERS = 2;
     public const RECIPIENT_USER_WORKERS = 4;
-    public const RECIPIENT_THIS_WORKER = 8;
-    public const RECIPIENT_ALL = 15;
+    public const RECIPIENT_ALL = 7;
 
     protected HttpServer $httpServer;
 
@@ -54,36 +53,43 @@ class SwooleMessageBus
     }
 
     /**
+     * Injects an event this worker
+     * @param string $topic
+     * @param mixed $message
+     * @return void
+     */
+    public function injectLocalEvent(string $topic, mixed $message) {
+        if (!array_key_exists($topic, $this->knownTopics)) {
+            $this->knownTopics[$topic] = 1;
+            $this->updateTopicLookupTable();
+        }
+
+        foreach ($this->topicLookupTable[$topic] as $cid) {
+            if (!array_key_exists($cid, $this->subscriptions)) {
+                continue;
+            }
+
+            // if coroutine is finished or was canceled in which the subscription was taken, force unsubcribe
+            if (!Coroutine::exists($cid)) {
+                unset($this->subscriptions[$cid]);
+                $this->updateTopicLookupTable();
+                continue;
+            }
+
+            $this->subscriptions[$cid][1]($this, $topic, $message);
+        }
+    }
+
+    /**
      * Publish a message to the given topic within the current worker/process
      * @param string $topic
      * @param mixed $message
-     * @param int $recipients
      */
-    public function publish(string $topic, mixed $message, int $recipients = self::RECIPIENT_EVENT_WORKERS)
+    public function publish(string $topic, mixed $message, int $recipients = self::RECIPIENT_ALL)
     {
-        if($recipients & self::RECIPIENT_THIS_WORKER) {
-            if (!array_key_exists($topic, $this->knownTopics)) {
-                $this->knownTopics[$topic] = 1;
-                $this->updateTopicLookupTable();
-            }
-
-            foreach ($this->topicLookupTable[$topic] as $cid) {
-                if (!array_key_exists($cid, $this->subscriptions)) {
-                    continue;
-                }
-
-                // if coroutine is finished or was canceled in which the subscription was taken, force unsubcribe
-                if (!Coroutine::exists($cid)) {
-                    unset($this->subscriptions[$cid]);
-                    $this->updateTopicLookupTable();
-                    continue;
-                }
-
-                $this->subscriptions[$cid][1]($this, $topic, $message);
-            }
-        }
-
-        $this->httpServer->sendMessage([$topic, $message], $recipients);
+        //always inject event on local worker
+        $this->injectLocalEvent($topic, $message);
+        $this->httpServer->broadcastMessage([$topic, $message], $recipients);
     }
 
     /**

@@ -19,7 +19,7 @@ final class HttpServer
     public const RECIPIENT_EVENT_WORKERS = 1;
     public const RECIPIENT_TASK_WORKERS = 2;
     public const RECIPIENT_USER_WORKERS = 4;
-    public const RECIPIENT_ALL = 15;
+    public const RECIPIENT_ALL = 7;
 
     public const GRACEFUL_SHUTDOWN_TIMEOUT_SECONDS = 10;
 
@@ -38,8 +38,6 @@ final class HttpServer
     private $signalReload;
     private $signalKill;
 
-    private array $metricsCache = [];
-
     /** @var Process[] $userWorkers */
     private array $userWorkers = [];
 
@@ -53,8 +51,8 @@ final class HttpServer
         $this->configuration = $configuration;
     }
 
-    public function addUserWorker(Process $worker) {
-        $this->userWorkers[] = $worker;
+    public function addUserWorker(string $name, Process $worker) {
+        $this->userWorkers[$name] = $worker;
     }
 
     /**
@@ -115,10 +113,6 @@ final class HttpServer
         }
     }
 
-    public function updateMetricsCache(): void {
-        $this->metricsCache = $this->getServer()->stats();
-    }
-
     public function metrics(): array
     {
         return $this->getServer()->stats();
@@ -146,45 +140,40 @@ final class HttpServer
         $this->getServer()->task($data);
     }
 
-    protected function sendMessageToWorkerType($message, $type) {
-        if('user_workers' === $type) {
-            foreach($this->userWorkers as $userWorker) {
-                $userWorker->write(igbinary_serialize([$this->server->worker_id, $message]));
-            }
-
-            return true;
-        }
-
-        if(!isset($this->metricsCache[$type])) {
-            return false;
-        }
-
-        foreach($this->metricsCache[$type] as $worker) {
-            $workerId = $worker['worker_id'];
-
-            // don't send a message to ourselve
-            if($workerId == $this->getServer()->worker_id)
-                continue;
-
-            $this->getServer()->sendMessage($message, $workerId);
-        }
-
-        return true;
-    }
-
-    public function sendMessage($message, $recipients = self::RECIPIENT_EVENT_WORKERS): void
+    public function broadcastMessage($message, $recipients = self::RECIPIENT_EVENT_WORKERS): void
     {
-        if(!$this->metricsCache)
-            $this->updateMetricsCache();
+        $myWorkerId = $this->getServer()->worker_id;
+        $workerCount = $this->configuration->getWorkerCount();
+        $taskWorkerCount = $this->configuration->getTaskWorkerCount();
+        $totalWorkerCount = $workerCount + $taskWorkerCount;
 
-        if($recipients & self::RECIPIENT_EVENT_WORKERS)
-            $this->sendMessageToWorkerType($message, 'event_workers');
+        if($recipients & self::RECIPIENT_EVENT_WORKERS) {
+            for($workerId=0; $workerId<$workerCount; $workerId++) {
+                if($workerId === $myWorkerId)
+                    continue;
 
-        if($recipients & self::RECIPIENT_TASK_WORKERS)
-            $this->sendMessageToWorkerType($message, 'task_workers');
+                $this->getServer()->sendMessage($message, $workerId);
+            }
+        }
 
-        if($recipients & self::RECIPIENT_USER_WORKERS)
-            $this->sendMessageToWorkerType($message, 'user_workers');
+        if($recipients & self::RECIPIENT_TASK_WORKERS) {
+            for($workerId=$workerCount; $workerId<$totalWorkerCount; $workerId++) {
+                if($workerId === $myWorkerId)
+                    continue;
+
+                $this->getServer()->sendMessage($message, $workerId);
+            }
+        }
+
+        if($recipients & self::RECIPIENT_USER_WORKERS) {
+            foreach($this->userWorkers as $name => $userWorker) {
+                $data = igbinary_serialize([$this->server->worker_id, $message]);
+                $bytesWritten = $userWorker->write($data);
+
+                if($bytesWritten !== strlen($data))
+                    throw new \RuntimeException("Could not fully write message to user worker pipe");
+            }
+        }
     }
 
     /**

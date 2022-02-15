@@ -28,8 +28,6 @@ class WithProcessHandler implements ConfiguratorInterface
     public function configure(Server $server): void
     {
         foreach($this->processes as $processDefinitionInstance) {
-            $processDefinitionName = get_class($processDefinitionInstance);
-
             $userWorker = new Process(function(Process $userWorker) use ($processDefinitionInstance, $server) {
                 Coroutine::create(function() use ($processDefinitionInstance) {
                     $processDefinitionInstance->run();
@@ -44,11 +42,8 @@ class WithProcessHandler implements ConfiguratorInterface
                 });
             });
 
-            $userWorker->name($processDefinitionName);
-
             $server->addProcess($userWorker);
-
-            $this->httpServer->addUserWorker($userWorker);
+            $this->httpServer->addUserWorker(get_class($processDefinitionInstance), $userWorker);
         }
     }
 }
