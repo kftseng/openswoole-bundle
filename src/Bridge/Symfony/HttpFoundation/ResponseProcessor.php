@@ -23,7 +23,7 @@ final class ResponseProcessor implements ResponseProcessorInterface
     public function process(HttpFoundationResponse $httpFoundationResponse, SwooleResponse $swooleResponse): void
     {
         if ($httpFoundationResponse instanceof SwooleStreamedResponse) {
-            $httpFoundationResponse->run($this->httpServer->getServer(), $swooleResponse);
+            $httpFoundationResponse->stream($this->httpServer->getServer(), $swooleResponse);
 
         } elseif ($httpFoundationResponse instanceof BinaryFileResponse) {
             $swooleResponse->sendfile($httpFoundationResponse->getFile()->getRealPath());
