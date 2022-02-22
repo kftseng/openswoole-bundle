@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace K911\Swoole\Bridge\Symfony\HttpFoundation;
 
+use Swoole\Coroutine;
 use Swoole\Coroutine\Channel;
 use Swoole\Http\Server;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +34,11 @@ class SwooleStreamedResponse extends Response
     public function push($data, $timeout = -1): bool {
         if(!$this->isWritable() || $this->isChannelClosed())
             throw new SwooleStreamEndedException();
+
+        if(Coroutine::getCid() === -1) {
+            // if this function is called outside a coroutine context, just return false
+            return false;
+        }
 
         return $this->channel->push($data, $timeout);
     }
