@@ -15,8 +15,6 @@ use K911\Swoole\Bridge\Symfony\HttpFoundation\RequestFactoryInterface;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\ResponseExposeSwooleRequestAttributesEventListener;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\Session\SetSessionCookieEventListener;
 use K911\Swoole\Bridge\Symfony\HttpFoundation\TrustAllProxiesRequestHandler;
-use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerPipeTransportFactory;
-use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerPipeTransportHandler;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportFactory;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportHandler;
 use K911\Swoole\Bridge\Upscale\Blackfire\WithProfiler;
@@ -25,7 +23,6 @@ use K911\Swoole\Server\Config\Sockets;
 use K911\Swoole\Server\Configurator\ConfiguratorInterface;
 use K911\Swoole\Server\HttpServer;
 use K911\Swoole\Server\HttpServerConfiguration;
-use K911\Swoole\Server\Process\PipeHandlerInterface;
 use K911\Swoole\Server\Process\ProcessInterface;
 use K911\Swoole\Server\RequestHandler\AdvancedStaticFilesServer;
 use K911\Swoole\Server\RequestHandler\ExceptionHandler\ExceptionHandlerInterface;
@@ -186,17 +183,6 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
             ->addArgument(new Reference(MessageBusInterface::class))
             ->addArgument(new Reference(SwooleServerTaskTransportHandler::class.'.inner'))
             ->setDecoratedService(TaskHandlerInterface::class, null, -10)
-        ;
-
-        $container->register(SwooleServerPipeTransportFactory::class)
-            ->addTag('messenger.transport_factory')
-            ->addArgument(new Reference(HttpServer::class))
-        ;
-
-        $container->register(SwooleServerPipeTransportHandler::class)
-            ->addArgument(new Reference(MessageBusInterface::class))
-            ->addArgument(new Reference(SwooleServerPipeTransportHandler::class.'.inner'))
-            ->setDecoratedService(PipeHandlerInterface::class, null, -10)
         ;
     }
 
