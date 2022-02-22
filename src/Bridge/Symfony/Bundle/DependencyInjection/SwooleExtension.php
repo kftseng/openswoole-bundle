@@ -20,8 +20,6 @@ use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerPipeTransportHandler;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportFactory;
 use K911\Swoole\Bridge\Symfony\Messenger\SwooleServerTaskTransportHandler;
 use K911\Swoole\Bridge\Upscale\Blackfire\WithProfiler;
-use K911\Swoole\MessageBus\SwooleMessageBus;
-use K911\Swoole\MessageBus\SwooleMessageBusPipeHandler;
 use K911\Swoole\Server\Config\Socket;
 use K911\Swoole\Server\Config\Sockets;
 use K911\Swoole\Server\Configurator\ConfiguratorInterface;
@@ -88,8 +86,6 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
         $config = $this->processConfiguration($configuration, $configs);
 
         $this->registerHttpServer($config['http_server'], $container);
-
-        $this->registerSwooleMessageBusConfiguration($container);
 
         if (\interface_exists(TransportFactoryInterface::class)) {
             $this->registerSwooleServerTransportConfiguration($container);
@@ -177,20 +173,6 @@ final class SwooleExtension extends Extension implements PrependExtensionInterfa
         $container->getDefinition(JsonExceptionHandler::class)
             ->setArgument('$verbosity', $verbosity)
         ;
-    }
-
-    private function registerSwooleMessageBusConfiguration(ContainerBuilder $container): void
-    {
-        $container->register(SwooleMessageBus::class)
-            ->addArgument(new Reference(HttpServer::class))
-        ;
-
-        $container->register(SwooleMessageBusPipeHandler::class)
-            ->addArgument(new Reference(SwooleMessageBus::class))
-            ->addArgument(new Reference(SwooleMessageBusPipeHandler::class.'.inner'))
-            ->setDecoratedService(PipeHandlerInterface::class, null, -20)
-        ;
-
     }
 
     private function registerSwooleServerTransportConfiguration(ContainerBuilder $container): void
