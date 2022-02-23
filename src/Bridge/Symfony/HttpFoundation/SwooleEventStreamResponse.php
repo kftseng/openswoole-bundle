@@ -15,7 +15,7 @@ class SwooleEventStreamResponse extends SwooleStreamedResponse
         ]);
     }
 
-    public function pushEvent(?string $event, ?string $data)
+    public function pushEvent(?string $event, ?string $data): bool
     {
         $message = "";
 

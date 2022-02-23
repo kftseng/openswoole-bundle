@@ -20,7 +20,8 @@ class SwooleStreamedResponse extends Response
         $this->channel = new Channel(1);
     }
 
-    public function isWritable() {
+    public function isWritable(): bool
+    {
         return $this->isResponseWritable;
     }
 
@@ -48,7 +49,8 @@ class SwooleStreamedResponse extends Response
             $this->channel->errCode === SWOOLE_CHANNEL_CLOSED;
     }
 
-    public function close() {
+    public function close(): static
+    {
         $this->channel->close();
         return $this;
     }
@@ -91,7 +93,7 @@ class SwooleStreamedResponse extends Response
      *
      * @return $this
      */
-    public function sendHeaders()
+    public function sendHeaders(): static
     {
         // this has no function in swoole stream context
         return $this;
@@ -102,7 +104,7 @@ class SwooleStreamedResponse extends Response
      *
      * @return $this
      */
-    public function send()
+    public function send(): static
     {
         // this has no function in swoole stream context
         return $this;
@@ -115,7 +117,7 @@ class SwooleStreamedResponse extends Response
      *
      * @return $this
      */
-    public function sendContent()
+    public function sendContent(): static
     {
         // this has no function in swoole stream context
         return $this;

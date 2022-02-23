@@ -32,5 +32,5 @@ interface StorageInterface
      *
      * @return null|mixed data Should return the same type as provided in set(), null when data is not available or expired
      */
-    public function get(string $key, ?callable $expired = null);
+    public function get(string $key, ?callable $expired = null): mixed;
 }

@@ -217,7 +217,7 @@ final class HttpClient implements \Serializable
     /**
      * @return array|string
      */
-    private function resolveResponseBody(Client $client)
+    private function resolveResponseBody(Client $client): array|string
     {
         if (204 === $client->statusCode || '' === $client->body) {
             return [];
