@@ -1,5 +1,5 @@
 {
-    "name": "temafey/openswoole-bundle",
+    "name": "evotide/openswoole-bundle",
     "type": "library",
     "description": "Swoole Symfony Bundle",
     "keywords": [
